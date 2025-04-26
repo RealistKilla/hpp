@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import QueryProvider from "./providers/query-provider";
+import JotaiProvider from "./providers/jotai-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,18 +17,21 @@ export const metadata: Metadata = {
   title: "BVNK HPP",
   description: "A demo app for the BVNK HPP",
 };
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // dehydrate the queryClient state to be shared between the client and server
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <JotaiProvider>{children}</JotaiProvider>
       </body>
     </html>
   );
