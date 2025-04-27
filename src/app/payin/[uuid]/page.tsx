@@ -1,5 +1,5 @@
 import AcceptQuoteCard from "../components/AcceptQuoteCard";
-import { getQuote } from "../services/getQuote";
+import { getQuoteSummary } from "../services/getQuoteSummary";
 
 type AcceptQuotePageProps = {
   params: Promise<{ uuid: string }>;
@@ -7,7 +7,7 @@ type AcceptQuotePageProps = {
 
 const AcceptQuotePage = async ({ params }: AcceptQuotePageProps) => {
   const { uuid } = await params;
-  const quote = await getQuote(uuid);
+  const quote = await getQuoteSummary(uuid);
 
   // handle error from axios call
   if (!quote) {
