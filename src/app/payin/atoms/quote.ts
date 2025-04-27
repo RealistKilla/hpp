@@ -5,9 +5,9 @@ import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
 import { useMemo } from "react";
 import { Currency, GetQuoteForCurrencyBody } from "../lib/types";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
-import { AxiosError } from "axios";
 
 export const quoteSchema = z.object({
+  status: z.string(),
   acceptanceExpiryDate: z.number(),
   merchantDisplayName: z.string(),
   displayCurrency: z.object({
@@ -41,7 +41,7 @@ export const useQuoteQuery = (uuid: string, initialData: Quote) => {
 export const quoteForCurrencyAtom = atomWithMutation<
   Quote,
   GetQuoteForCurrencyBody,
-  AxiosError
+  Error
 >(() => ({
   mutationKey: ["quote"],
   mutationFn: (body) => getQuoteForCurrency(body),

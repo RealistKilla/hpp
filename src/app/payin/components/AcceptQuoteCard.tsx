@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import {
   isCurrencySelectOpenAtom,
   Quote,
@@ -31,6 +31,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
 import { acceptQuoteForCurrency } from "../services/acceptQuoteForCurrency";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type AcceptQuoteCardProps = {
   quote: Quote;
@@ -38,7 +39,7 @@ type AcceptQuoteCardProps = {
 const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({ quote }) => {
   const { uuid }: { uuid: string } = useParams();
   const router = useRouter();
-
+  const pathname = usePathname();
   // pass server quote to jotai atom
   const quoteData = useQuoteQuery(uuid, quote);
 
@@ -49,7 +50,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({ quote }) => {
 
   // state for selected currency
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
-
+  const hasSelectedValue = !!selectedCurrency;
   const [
     {
       data: quoteForCurrency,
@@ -58,6 +59,23 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({ quote }) => {
       error: quoteForCurrencyError,
     },
   ] = useAtom(quoteForCurrencyAtom);
+  // if the quote is expired, redirect to expired page
+  useEffect(() => {
+    if (quote?.status === "EXPIRED") {
+      router.replace(`${pathname}/expired`);
+    }
+  }, [quote, router]);
+
+  // if we have a selected currency, fetch the quote for that currency
+  useEffect(() => {
+    if (selectedCurrency) {
+      mutateQuoteForCurrency({
+        uuid: uuid,
+        currency: selectedCurrency?.value!,
+        payInMethod: "crypto",
+      });
+    }
+  }, [selectedCurrency]);
 
   return (
     <Card className="max-w-xl mx-auto">
@@ -111,11 +129,6 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({ quote }) => {
                             ? undefined
                             : currencies.find((c) => c.value === currentValue)
                         );
-                        mutateQuoteForCurrency({
-                          uuid: uuid,
-                          currency: selectedCurrency?.value!,
-                          payInMethod: "crypto",
-                        });
 
                         setIsCurrencySelectOpen(false);
                       }}
@@ -180,7 +193,8 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({ quote }) => {
           </Button>
         </>
       )}
-      <div>{quoteForCurrencyError && <div className="text-red-500"></div>}</div>
+      {/* <div>{quoteForCurrencyError && <div className="text-red-500"> */}
+      {/* {quoteForCurrencyError.</div>}</div> */}
     </Card>
   );
 };

@@ -7,7 +7,7 @@ type AcceptQuotePageProps = {
 
 const AcceptQuotePage = async ({ params }: AcceptQuotePageProps) => {
   const { uuid } = await params;
-  const quote = await getQuoteSummary(uuid);
+  const quote = await getQuoteSummary(uuid, true);
 
   // handle error from axios call
   if (!quote) {
