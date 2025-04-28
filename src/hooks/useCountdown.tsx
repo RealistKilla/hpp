@@ -1,26 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 // Type definitions
-interface CountdownState {
+type CountdownState = {
   timeLeft: number;
   expired: boolean;
   hours: number;
   minutes: number;
   seconds: number;
   formatted: string;
-}
+};
 
-interface CountdownTimerProps {
-  targetTimeMs: number | undefined;
-  onExpire: () => void | Promise<void>;
-}
-
-/**
- * A hook that provides countdown functionality based on a target timestamp
- * @param targetTimeMs - Target timestamp in milliseconds (epoch time)
- * @param onExpire - Callback function to be executed when timer expires
- * @returns Object containing countdown state and formatted time
- */
 export const useCountdown = (
   targetTimeMs: number | undefined,
   onExpire?: () => void | Promise<void>

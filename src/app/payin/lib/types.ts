@@ -18,6 +18,12 @@ export type AcceptQuoteForCurrencyBody = {
 
 export const quoteSchema = z.object({
   status: z.string(),
+  quoteStatus: z.string(),
+  address: z.object({
+    address: z.string(),
+    protocol: z.string(),
+    uri: z.string(),
+  }),
   acceptanceExpiryDate: z.number(),
   merchantDisplayName: z.string(),
   displayCurrency: z.object({
@@ -33,3 +39,9 @@ export const quoteSchema = z.object({
 });
 
 export type Quote = z.infer<typeof quoteSchema>;
+
+export enum CurrencyName {
+  BTC = "Bitcoin",
+  ETH = "Ethereum",
+  LTC = "Litecoin",
+}

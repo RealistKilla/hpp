@@ -54,10 +54,13 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
   // state for selected currency
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
 
+  const getFullCurrency = (currency: string) => {
+    return currencies.find((c) => c.value === currency);
+  };
+
   const handleCurrencySelect = async (currency: string) => {
-    const fullCurrency: Currency | undefined = currencies.find(
-      (c) => c.value === currency
-    );
+    const fullCurrency = getFullCurrency(currency);
+
     if (fullCurrency) {
       setSelectedCurrency(fullCurrency);
       try {
@@ -78,6 +81,27 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
   // if the quote is expired, redirect to expired page
 
   // if we have a selected currency, fetch the quote for that currency
+
+  const redirectToCorrectPage = (status: Quote["status"]) => {
+    console.log("status", status);
+    if (status === "ACCEPTED") {
+      router.replace(`${pathname}/pay`);
+    } else if (status === "EXPIRED") {
+      router.replace(`${pathname}/expired`);
+    }
+  };
+
+  const onAcceptClick = async () => {
+    try {
+      await acceptQuoteForCurrency({
+        uuid: uuid,
+        successUrl: "no_url",
+      });
+
+      const newQuote = await quote.refetch();
+      newQuote.data && redirectToCorrectPage(newQuote.data?.quoteStatus);
+    } catch (error: any) {}
+  };
 
   return (
     <Card className="max-w-xl mx-auto">
@@ -171,11 +195,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                   });
                   const newQuote = await quote.refetch();
 
-                  if (newQuote.data?.status === "ACCEPTED") {
-                    router.replace(`${pathname}/pay`);
-                  } else if (newQuote.data?.status === "EXPIRED") {
-                    router.replace(`${pathname}/expired`);
-                  }
+                  newQuote.data && redirectToCorrectPage(newQuote.data?.status);
                 } catch (error) {
                   router.replace(`${pathname}/expired`);
                 }
@@ -186,30 +206,14 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
             variant="outline"
             onClick={async () => {
               try {
-                const result = await acceptQuoteForCurrency({
-                  uuid: uuid,
-                  successUrl: "no_url",
-                });
-
-                const newQuote = await quote.refetch();
-                if (newQuote.data?.status === "ACCEPTED") {
-                  router.replace(`${pathname}/pay`);
-                } else if (newQuote.data?.status === "EXPIRED") {
-                  router.replace(`${pathname}/expired`);
-                }
-
-                console.log("WE ARE IN THE ONCLICK BLOCK", result);
-              } catch (error: any) {
-                console.log("WE ARE IN THE CATCH BLOCK", error);
-              }
+                await onAcceptClick();
+              } catch (error: any) {}
             }}
           >
             Confirm
           </Button>
         </>
       )}
-      {/* <div>{quoteForCurrencyError && <div className="text-red-500"> */}
-      {/* {quoteForCurrencyError.</div>}</div> */}
     </Card>
   );
 };

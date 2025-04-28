@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import AcceptQuoteCard from "../components/AcceptQuoteCard";
 import { getQuoteSummary } from "../services/getQuoteSummary";
+import { redirect } from "next/navigation";
 
 type AcceptQuotePageProps = {
   params: Promise<{ uuid: string }>;
@@ -13,10 +13,7 @@ const AcceptQuotePage = async ({ params }: AcceptQuotePageProps) => {
   // redirect to expired page if quote is expired
   if (quote.status === "EXPIRED") {
     return redirect(`/payin/${uuid}/expired`);
-  }
-
-  // redirect to pay page if quote is accepted
-  if (quote.status === "ACCEPTED") {
+  } else if (quote.quoteStatus === "ACCEPTED") {
     return redirect(`/payin/${uuid}/pay`);
   }
 
