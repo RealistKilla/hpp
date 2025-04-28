@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   console.log("PUT");
   const { uuid } = await params;
-  const body = (await req.json()) as GetQuoteForCurrencyBody;
+  const body = (await req.json()) as Omit<GetQuoteForCurrencyBody, "uuid">;
   const safeUUID = uuid ? encodeURIComponent(uuid) : null;
 
   if (!uuid) {

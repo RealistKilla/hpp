@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { Quote } from "../atoms/quote";
+import { Quote } from "../lib/types";
 import { AxiosResponse } from "axios";
 import { bvnkApi } from "@/lib/bvnkApi";
 

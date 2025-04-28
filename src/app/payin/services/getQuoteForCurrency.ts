@@ -1,7 +1,7 @@
 "use client";
 import { GetQuoteForCurrencyBody } from "../lib/types";
 import { AxiosResponse } from "axios";
-import { Quote } from "../atoms/quote";
+import { Quote } from "../lib/types";
 import { api } from "@/lib/api";
 
 const errors: Record<string, string> = {

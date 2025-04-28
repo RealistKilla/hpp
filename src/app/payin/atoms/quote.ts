@@ -5,6 +5,7 @@ import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
 import { useMemo } from "react";
 import { Currency, GetQuoteForCurrencyBody } from "../lib/types";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
+import { AxiosError } from "axios";
 
 export const quoteSchema = z.object({
   status: z.string(),

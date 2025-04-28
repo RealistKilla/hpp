@@ -5,7 +5,7 @@ export const CountdownTimer: React.FC<{
   targetTimeMs: number;
   onExpire?: () => void;
 }> = ({ targetTimeMs, onExpire }) => {
-  const { minutes, seconds } = useCountdown(targetTimeMs, { onExpire });
+  const { minutes, seconds } = useCountdown(targetTimeMs, onExpire);
 
   return (
     <div>

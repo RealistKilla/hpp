@@ -1,53 +1,160 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
-interface UseCountdownOptions {
-  /** Called once, exactly when the timer reaches 0 */
-  onExpire?: () => void;
+// Type definitions
+interface CountdownState {
+  timeLeft: number;
+  expired: boolean;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  formatted: string;
 }
 
-export function useCountdown(
-  targetTimeMs: number,
-  { onExpire }: UseCountdownOptions = {}
-) {
-  // Compute initial seconds left (rounded up so partial seconds count)
-  const calcInitialSeconds = () =>
-    Math.max(Math.ceil((targetTimeMs - Date.now()) / 1000), 0);
+interface CountdownTimerProps {
+  targetTimeMs: number | undefined;
+  onExpire: () => void | Promise<void>;
+}
 
-  const [secondsLeft, setSecondsLeft] = useState(calcInitialSeconds);
-  //   const onExpireRef = useRef(onExpire);
+/**
+ * A hook that provides countdown functionality based on a target timestamp
+ * @param targetTimeMs - Target timestamp in milliseconds (epoch time)
+ * @param onExpire - Callback function to be executed when timer expires
+ * @returns Object containing countdown state and formatted time
+ */
+export const useCountdown = (
+  targetTimeMs: number | undefined,
+  onExpire?: () => void | Promise<void>
+): CountdownState => {
+  // Store the previous targetTimeMs to compare
+  const prevTargetRef = useRef<number | undefined>(undefined);
+  // Store whether onExpire was called for the current target
+  const expiredForTargetRef = useRef<number | undefined>(undefined);
+  // Store interval reference
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Keep callback ref up to date without re-running effect
-  //   useEffect(() => {
-  //     onExpireRef.current = onExpire;
-  //   }, [onExpire]);
+  const calculateTimeLeft = useCallback(() => {
+    if (!targetTimeMs) {
+      return {
+        timeLeft: 0,
+        expired: true,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      };
+    }
+
+    const difference = targetTimeMs - Date.now();
+
+    if (difference <= 0) {
+      return {
+        timeLeft: 0,
+        expired: true,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      };
+    }
+
+    return {
+      timeLeft: difference,
+      expired: false,
+      hours: Math.floor(difference / (1000 * 60 * 60)),
+      minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((difference % (1000 * 60)) / 1000),
+    };
+  }, [targetTimeMs]);
+
+  const [countdown, setCountdown] = useState(calculateTimeLeft());
+
+  // Format time for display
+  const formatTime = useCallback((): string => {
+    if (countdown.expired) return "00:00:00";
+
+    const { hours, minutes, seconds } = countdown;
+    const padZero = (num: number): string => String(num).padStart(2, "0");
+
+    return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+  }, [countdown]);
+
+  // Handle expiry only once per unique targetTimeMs
+  const handleExpire = useCallback(async () => {
+    // Only call onExpire if we haven't called it for this specific target time
+    if (
+      targetTimeMs &&
+      expiredForTargetRef.current !== targetTimeMs &&
+      onExpire
+    ) {
+      console.log("calling onExpire for target:", targetTimeMs);
+      // Mark this target as expired
+      expiredForTargetRef.current = targetTimeMs;
+
+      try {
+        await onExpire();
+      } catch (error) {
+        console.error("Error in onExpire callback:", error);
+      }
+    }
+  }, [targetTimeMs, onExpire]);
 
   useEffect(() => {
-    // Whenever targetTimeMs changes, reset the countdown
-    setSecondsLeft(calcInitialSeconds());
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
 
-    if (secondsLeft === 0) {
-      onExpire?.();
+    // Skip if no target time
+    if (!targetTimeMs) {
       return;
     }
 
-    const id = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(id);
-          onExpire?.();
-          return 0;
+    // Check if targetTimeMs has changed
+    const targetChanged = prevTargetRef.current !== targetTimeMs;
+    if (targetChanged) {
+      console.log(
+        "Target changed from",
+        prevTargetRef.current,
+        "to",
+        targetTimeMs
+      );
+      prevTargetRef.current = targetTimeMs;
+    }
+
+    // Calculate initial state
+    const initialTimeLeft = calculateTimeLeft();
+    setCountdown(initialTimeLeft);
+
+    // If already expired, call onExpire once
+    if (initialTimeLeft.expired) {
+      handleExpire();
+      return;
+    }
+
+    // Set up the timer
+    intervalRef.current = setInterval(() => {
+      const newTimeLeft = calculateTimeLeft();
+      setCountdown(newTimeLeft);
+
+      if (newTimeLeft.expired) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-        return prev - 1;
-      });
+        handleExpire();
+      }
     }, 1000);
 
-    return () => clearInterval(id);
-    // We intentionally omit secondsLeft here so the interval logic
-    // always runs freshly when targetTimeMs changes
-  }, [targetTimeMs]);
+    // Cleanup on unmount or targetTimeMs change
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [targetTimeMs, calculateTimeLeft, handleExpire]);
 
-  const minutes = Math.floor(secondsLeft / 60);
-  const seconds = secondsLeft % 60;
-
-  return { minutes, seconds, secondsLeft };
-}
+  return {
+    ...countdown,
+    formatted: formatTime(),
+  };
+};
