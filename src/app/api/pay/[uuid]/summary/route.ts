@@ -1,8 +1,9 @@
+import { getQuoteSummarySchema } from "@/app/payin/validation/schema";
 import { bvnkApi } from "@/lib/bvnkApi";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ uuid: string }> }
 ) {
   const { uuid } = await params;
@@ -10,6 +11,18 @@ export async function GET(
 
   if (!uuid) {
     return new NextResponse("No uuid provided", { status: 400 });
+  }
+
+  if (req.method !== "GET") {
+    return new NextResponse("Method not allowed", { status: 405 });
+  }
+
+  const validationResult = getQuoteSummarySchema.safeParse({ uuid });
+
+  if (!validationResult.success) {
+    return new NextResponse(JSON.stringify(validationResult.error), {
+      status: 400,
+    });
   }
 
   try {

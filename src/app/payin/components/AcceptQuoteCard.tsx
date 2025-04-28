@@ -30,6 +30,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 
 import { acceptQuoteForCurrency } from "../services/acceptQuoteForCurrency";
 import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 
 type AcceptQuoteCardProps = {
   quote: Quote;
@@ -58,30 +59,39 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
     return currencies.find((c) => c.value === currency);
   };
 
+  const {
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      currency: "Please select a currency...",
+    },
+  });
   const handleCurrencySelect = async (currency: string) => {
     const fullCurrency = getFullCurrency(currency);
 
+    // when we select a currency we want to fetch a new quote for currency as well as refetch the quote summary
     if (fullCurrency) {
       setSelectedCurrency(fullCurrency);
-      try {
-        await updateQuote({
-          uuid,
-          currency: fullCurrency?.value!,
-          payInMethod: "crypto",
-        });
+      if (!errors.currency) {
+        try {
+          await updateQuote({
+            uuid,
+            currency: getValues("currency"),
+            payInMethod: "crypto",
+          });
 
-        await quote.refetch();
-      } catch (error) {
-        console.log("error", error);
+          await quote.refetch();
+        } catch (error) {
+          console.log("error", error);
+        }
       }
     }
     setIsCurrencySelectOpen(false);
   };
 
   // if the quote is expired, redirect to expired page
-
-  // if we have a selected currency, fetch the quote for that currency
-
   const redirectToCorrectPage = (status: Quote["status"]) => {
     console.log("status", status);
     if (status === "ACCEPTED") {
@@ -101,6 +111,21 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
       const newQuote = await quote.refetch();
       newQuote.data && redirectToCorrectPage(newQuote.data?.quoteStatus);
     } catch (error: any) {}
+  };
+
+  const onQuoteExpire = async () => {
+    try {
+      await updateQuote({
+        uuid,
+        currency: selectedCurrency?.value!,
+        payInMethod: "crypto",
+      });
+      const newQuote = await quote.refetch();
+
+      newQuote.data && redirectToCorrectPage(newQuote.data?.status);
+    } catch (error) {
+      router.replace(`${pathname}/expired`);
+    }
   };
 
   return (
@@ -124,96 +149,86 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
             <p>For reference number: {quote?.data?.reference}</p>
           </div>
         </div>
-        <Popover
-          open={isCurrencySelectOpen}
-          onOpenChange={setIsCurrencySelectOpen}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={isCurrencySelectOpen}
-              className="w-[200px] justify-between"
-            >
-              <p>{selectedCurrency?.label ?? "Select currency"}</p>
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput placeholder="Search currency..." />
-              <CommandList>
-                <CommandEmpty>No currencies found.</CommandEmpty>
-                <CommandGroup>
-                  {currencies.map((currency: Currency) => (
-                    <CommandItem
-                      key={currency.value}
-                      value={currency.value}
-                      onSelect={(currentValue: Currency["value"]) => {
-                        handleCurrencySelect(currentValue);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedCurrency === currency
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      {currency.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <form onSubmit={onAcceptClick}>
+          <Controller
+            name="currency"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Popover
+                open={isCurrencySelectOpen}
+                onOpenChange={setIsCurrencySelectOpen}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={isCurrencySelectOpen}
+                    className="w-[200px] justify-between"
+                  >
+                    <p>{getValues("currency")}</p>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search currency..." />
+                    <CommandList>
+                      <CommandEmpty>No currencies found.</CommandEmpty>
+                      <CommandGroup>
+                        {currencies.map((currency: Currency) => (
+                          <CommandItem
+                            key={currency.value}
+                            value={currency.value}
+                            onSelect={(currentValue: Currency["value"]) => {
+                              field.onChange(currentValue);
+                              handleCurrencySelect(currentValue);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedCurrency === currency
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {currency.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            )}
+          />
+          {quote?.data?.acceptanceExpiryDate && (
+            <>
+              <div>
+                <p>Amount due:</p>
+                <span>
+                  {quote?.data?.paidCurrency.amount}{" "}
+                  {quote?.data?.paidCurrency.currency}
+                </span>
+              </div>
+              <div>
+                <p>Quoted price expires in:</p>
+                <CountdownTimer
+                  targetTimeMs={
+                    // quoteForCurrency.acceptanceExpiryDate ??
+                    quote?.data?.acceptanceExpiryDate
+                  }
+                  onExpire={onQuoteExpire}
+                />
+              </div>
+              <Button variant="outline" type="submit">
+                Confirm
+              </Button>
+            </>
+          )}
+        </form>
       </CardContent>
-      {quote?.data?.acceptanceExpiryDate && (
-        <>
-          <div>
-            <p>Amount due:</p>
-            <span>
-              {quote?.data?.paidCurrency.amount}{" "}
-              {quote?.data?.paidCurrency.currency}
-            </span>
-          </div>
-          <div>
-            <p>Quoted price expires in:</p>
-            <CountdownTimer
-              targetTimeMs={
-                // quoteForCurrency.acceptanceExpiryDate ??
-                quote?.data?.acceptanceExpiryDate
-              }
-              onExpire={async () => {
-                try {
-                  await updateQuote({
-                    uuid,
-                    currency: selectedCurrency?.value!,
-                    payInMethod: "crypto",
-                  });
-                  const newQuote = await quote.refetch();
-
-                  newQuote.data && redirectToCorrectPage(newQuote.data?.status);
-                } catch (error) {
-                  router.replace(`${pathname}/expired`);
-                }
-              }}
-            />
-          </div>
-          <Button
-            variant="outline"
-            onClick={async () => {
-              try {
-                await onAcceptClick();
-              } catch (error: any) {}
-            }}
-          >
-            Confirm
-          </Button>
-        </>
-      )}
     </Card>
   );
 };

@@ -10,7 +10,7 @@ const errors: Record<string, string> = {
 
 export const getQuoteForCurrency = async (body: GetQuoteForCurrencyBody) => {
   const safeUUID = encodeURIComponent(body.uuid);
-  console.log("getQuoteForCurrency RUNNING", body);
+
   try {
     const response: AxiosResponse<Quote> = await api.put(
       `pay/${safeUUID}/update/summary`,

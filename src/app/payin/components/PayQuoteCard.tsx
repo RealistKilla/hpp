@@ -25,7 +25,7 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
   const { uuid }: { uuid: string } = useParams();
   const quote = useQuoteQuery(uuid, initialQuote);
   const router = useRouter();
-  const pathname = usePathname();
+
   // get the full currency name from the currency enum
   const fullCurrencyName =
     CurrencyName[
@@ -33,6 +33,13 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
     ];
   const currencyName = quote.data?.paidCurrency.currency;
   const truncatedAddress = truncateMiddle(quote.data?.address.address!, 15);
+
+  const onQuoteExpire = async () => {
+    // doing it like this because the quote value is not updated when we want to use it for comparison here.
+    const newQuote = await quote.refetch();
+
+    newQuote.data?.status === "EXPIRED" && router.replace(`expired`);
+  };
   return (
     <Card>
       <CardHeader>
@@ -73,11 +80,7 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
           <p>Time left to pay</p>
           <CountdownTimer
             targetTimeMs={quote.data?.quoteExpiryDate!}
-            onExpire={async (isDone: boolean) => {
-              const newQuote = await quote.refetch();
-
-              newQuote.data?.status === "EXPIRED" && router.replace(`expired`);
-            }}
+            onExpire={onQuoteExpire}
           />
         </div>
       </CardFooter>
