@@ -5,7 +5,6 @@ import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
 import { useMemo } from "react";
 import { Currency, GetQuoteForCurrencyBody, Quote } from "../lib/types";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
-import { AxiosError } from "axios";
 
 export const useQuoteQuery = (uuid: string, initialData: Quote) => {
   const quoteAtom = useMemo(

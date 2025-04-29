@@ -1,5 +1,6 @@
 // app/expired/page.test.tsx
 import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import ExpiredPage from "./page";
 // 1. Mock next/image so it just renders an <img> with the given props
