@@ -60,6 +60,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
   };
 
   const {
+    handleSubmit,
     getValues,
     control,
     formState: { errors },
@@ -110,7 +111,9 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
       const newQuote = await quote.refetch();
       newQuote.data && redirectToCorrectPage(newQuote.data?.quoteStatus);
-    } catch (error: any) {}
+    } catch (error: any) {
+      console.log(error.response.data);
+    }
   };
 
   const onQuoteExpire = async () => {
@@ -133,7 +136,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
       <CardHeader>
         <CardTitle>
           <div className="flex flex-col items-center">
-            <h2>{quote?.data?.merchantDisplayName}</h2>
+            <h1>{quote?.data?.merchantDisplayName}</h1>
             <h2 className="text-3xl">
               {quote?.data?.displayCurrency.amount}
               <span className="text-lg pl-1">
@@ -149,7 +152,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
             <p>For reference number: {quote?.data?.reference}</p>
           </div>
         </div>
-        <form onSubmit={onAcceptClick}>
+        <form onSubmit={handleSubmit(onAcceptClick)}>
           <Controller
             name="currency"
             control={control}
@@ -161,6 +164,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
               >
                 <PopoverTrigger asChild>
                   <Button
+                    data-testid="currency-selector"
                     variant="outline"
                     role="combobox"
                     aria-expanded={isCurrencySelectOpen}
@@ -170,7 +174,10 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent
+                  data-testid="currency-menu"
+                  className="w-[200px] p-0"
+                >
                   <Command>
                     <CommandInput placeholder="Search currency..." />
                     <CommandList>
@@ -178,6 +185,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                       <CommandGroup>
                         {currencies.map((currency: Currency) => (
                           <CommandItem
+                            data-testid="currency-item"
                             key={currency.value}
                             value={currency.value}
                             onSelect={(currentValue: Currency["value"]) => {
@@ -222,7 +230,11 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                   onExpire={onQuoteExpire}
                 />
               </div>
-              <Button variant="outline" type="submit">
+              <Button
+                data-testid="accept-button"
+                variant="outline"
+                type="submit"
+              >
                 Confirm
               </Button>
             </>

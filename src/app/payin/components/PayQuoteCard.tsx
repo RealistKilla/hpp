@@ -71,7 +71,11 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
           </div>
         </div>
         <div>
-          <QRCode value={quote.data?.address.uri!} size={200} />
+          <QRCode
+            data-testid="qr-code"
+            value={quote.data?.address.uri!}
+            size={200}
+          />
           <p>{quote.data?.address.address}</p>
         </div>
       </CardContent>
