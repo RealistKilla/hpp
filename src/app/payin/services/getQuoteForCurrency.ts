@@ -14,12 +14,11 @@ export const getQuoteForCurrency = async (body: GetQuoteForCurrencyBody) => {
   try {
     const response: AxiosResponse<Quote> = await api.put(
       `pay/${safeUUID}/update/summary`,
-      { currency: body.currency, payinMethod: body.payInMethod }
+      { currency: body.currency, payInMethod: body.payInMethod }
     );
     console.log("response", response);
     return response.data;
   } catch (error: any) {
-    console.log("error", error.response);
-    throw error.response;
+    throw error;
   }
 };

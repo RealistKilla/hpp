@@ -15,7 +15,6 @@ const PayPage = async ({ params }: PageQuotePageProps) => {
   if (quote.quoteStatus === "EXPIRED") {
     return redirect(`/payin/${uuid}/pay`);
   }
-  // redirectToCorrectPageServer(quote.quoteStatus, uuid);
 
   return <PayQuoteCard quote={quote} />;
 };

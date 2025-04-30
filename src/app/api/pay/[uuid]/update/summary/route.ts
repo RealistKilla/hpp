@@ -20,11 +20,11 @@ export async function PUT(
     uuid,
   });
 
-  // if (!validationResult.success) {
-  //   return new NextResponse(JSON.stringify(validationResult.error), {
-  //     status: 400,
-  //   });
-  // }
+  if (!validationResult.success) {
+    return new NextResponse(JSON.stringify(validationResult.error), {
+      status: 400,
+    });
+  }
 
   if (!uuid) {
     return new NextResponse("No uuid provided", { status: 400 });

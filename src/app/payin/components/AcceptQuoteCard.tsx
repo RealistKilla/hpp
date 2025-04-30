@@ -94,7 +94,6 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
   // if the quote is expired, redirect to expired page
   const redirectToCorrectPage = (status: Quote["status"]) => {
-    console.log("status", status);
     if (status === "ACCEPTED") {
       router.replace(`${pathname}/pay`);
     } else if (status === "EXPIRED") {

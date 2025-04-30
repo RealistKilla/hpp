@@ -19,11 +19,11 @@ export async function GET(
 
   const validationResult = getQuoteSummarySchema.safeParse({ uuid });
 
-  // if (!validationResult.success) {
-  //   return new NextResponse(JSON.stringify(validationResult.error), {
-  //     status: 400,
-  //   });
-  // }
+  if (!validationResult.success) {
+    return new NextResponse(JSON.stringify(validationResult.error), {
+      status: 400,
+    });
+  }
 
   try {
     const response = await bvnkApi.get(`pay/${safeUUID}/summary`);
