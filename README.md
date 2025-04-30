@@ -23,6 +23,8 @@ packages:
 - jotai-tanstack-query
 - react-qr-code
 - cypress
+- jest
+- react-testing-library
 
 ## Running the app
 
@@ -55,3 +57,25 @@ yarn cypress:open
 To run the end-to-end smoke test, first, install the dependencies:
 
 Copy the uuid generated from the postman request and paste it in the cypress.config.ts file.
+
+### Jest
+
+To run the jest tests, first, install the dependencies:
+
+Then, run the tests:
+
+```bash
+yarn test
+```
+
+### Linting
+
+# Notes
+
+- Things I would like to add:
+  - Component testing
+  - Deeper End-to-end testing
+  - Server actions for put requests
+  - Put more effort into thinking about file structure using app router
+
+.env is checked in to make it easier to run the app locally specifically for this test.
