@@ -129,6 +129,6 @@
     @apply text-2xl font-semibold;
   }
   p {
-    @apply text-base;
+    @apply text-[14px];
   }
 }

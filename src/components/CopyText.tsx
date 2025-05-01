@@ -15,12 +15,12 @@ const CopyText: React.FC<CopyTextProps> = ({ text }) => {
     }
   };
   return (
-    <h3
+    <p
       className="font-bold text-primary cursor-pointer"
       onClick={async () => await onCopyClick()}
     >
       Copy
-    </h3>
+    </p>
   );
 };
 

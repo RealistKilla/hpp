@@ -1,5 +1,6 @@
 "use client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -27,6 +28,7 @@ import { currencies } from "../constants";
 import { Currency, Quote } from "../lib/types";
 import { cn } from "@/lib/utils";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import Separator from "@/components/ui/Separator";
 
 import { acceptQuoteForCurrency } from "../services/acceptQuoteForCurrency";
 import { useRouter } from "next/navigation";
@@ -45,7 +47,8 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
   // pass server quote to jotai atom
   const quote = useQuoteQuery(uuid, initialQuote);
 
-  const [{ mutateAsync: updateQuote }] = useAtom(quoteForCurrencyAtom);
+  const [{ mutateAsync: updateQuote, isLoading: isUpdatingQuote }] =
+    useAtom(quoteForCurrencyAtom);
 
   // handles open and closing of currency select
   const [isCurrencySelectOpen, setIsCurrencySelectOpen] = useAtom(
@@ -66,7 +69,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      currency: "Please select a currency...",
+      currency: "Select currency...",
     },
   });
   const handleCurrencySelect = async (currency: string) => {
@@ -124,19 +127,19 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
       });
       const newQuote = await quote.refetch();
 
-      newQuote.data && redirectToCorrectPage(newQuote.data?.status);
+      // newQuote.data && redirectToCorrectPage(newQuote.data?.status);
     } catch (error) {
       router.replace(`${pathname}/expired`);
     }
   };
 
   return (
-    <Card className="max-w-xl mx-auto">
-      <CardHeader>
+    <Card className="max-w-xl mx-auto gap-y-4">
+      <CardHeader className="mb-4">
         <CardTitle>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center gap-y-2">
             <h1>{quote?.data?.merchantDisplayName}</h1>
-            <h2 className="text-3xl">
+            <h2 className="text-4xl">
               {quote?.data?.displayCurrency.amount}
               <span className="text-lg pl-1">
                 {quote?.data?.displayCurrency.currency}
@@ -145,13 +148,18 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col items-center">
+      <CardContent className="w-full">
+        <div className="flex flex-col items-center mb-8">
           <div className="text-center">
-            <p>For reference number: {quote?.data?.reference}</p>
+            <p className="text-gray">
+              For reference number:{" "}
+              <span className="text-black font-semibold">
+                {quote?.data?.reference}
+              </span>
+            </p>
           </div>
         </div>
-        <form onSubmit={handleSubmit(onAcceptClick)}>
+        <form className={"w-full"} onSubmit={handleSubmit(onAcceptClick)}>
           <Controller
             name="currency"
             control={control}
@@ -161,23 +169,27 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                 open={isCurrencySelectOpen}
                 onOpenChange={setIsCurrencySelectOpen}
               >
+                <p>Pay with</p>
                 <PopoverTrigger asChild>
                   <Button
                     data-testid="currency-selector"
                     variant="outline"
                     role="combobox"
                     aria-expanded={isCurrencySelectOpen}
-                    className="w-[200px] justify-between"
+                    className="w-full h-12 justify-between"
                   >
                     <p>{getValues("currency")}</p>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <div className="flex">
+                      {quote.isLoading && <Loader2 className="animate-spin" />}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </div>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
                   data-testid="currency-menu"
-                  className="w-[200px] p-0"
+                  className="w-full p-0"
                 >
-                  <Command>
+                  <Command className="w-full">
                     <CommandInput placeholder="Search currency..." />
                     <CommandList>
                       <CommandEmpty>No currencies found.</CommandEmpty>
@@ -211,16 +223,18 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
             )}
           />
           {quote?.data?.acceptanceExpiryDate && (
-            <>
-              <div>
-                <p>Amount due:</p>
-                <span>
+            <div className="w-full pt-6">
+              <Separator className="my-2" />
+              <div className="w-full flex justify-between gap-y-2">
+                <p className="text-gray">Amount due:</p>
+                <p className="font-semibold">
                   {quote?.data?.paidCurrency.amount}{" "}
                   {quote?.data?.paidCurrency.currency}
-                </span>
+                </p>
               </div>
-              <div>
-                <p>Quoted price expires in:</p>
+              <Separator className="my-2" />
+              <div className="w-full flex justify-between gap-y-2">
+                <p className="text-gray">Quoted price expires in:</p>
                 <CountdownTimer
                   targetTimeMs={
                     // quoteForCurrency.acceptanceExpiryDate ??
@@ -229,14 +243,22 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                   onExpire={onQuoteExpire}
                 />
               </div>
-              <Button
-                data-testid="accept-button"
-                variant="outline"
-                type="submit"
-              >
-                Confirm
-              </Button>
-            </>
+              <Separator className="my-2" />
+              <div className="pt-8">
+                <Button
+                  className="w-full h-12 bg-primary cursor-pointer hover:bg-primary hover:text-white text-white"
+                  data-testid="accept-button"
+                  variant="outline"
+                  type="submit"
+                >
+                  {isUpdatingQuote ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    "Confirm"
+                  )}
+                </Button>
+              </div>
+            </div>
           )}
         </form>
       </CardContent>

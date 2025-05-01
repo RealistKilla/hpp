@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${interSans.variable} ${geistMono.variable} antialiased h-screen w-screen`}
+        className={`${interSans.className} ${geistMono.variable} antialiased h-screen w-screen`}
       >
         <JotaiProvider>
           <div className="flex items-center justify-center h-full w-full px-4 sm:px-8">
