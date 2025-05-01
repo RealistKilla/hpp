@@ -9,7 +9,9 @@ export const CountdownTimer: React.FC<{
 
   return (
     <div>
-      {minutes}:{seconds.toString().padStart(2, "0")}
+      <p className="font-semibold">
+        {minutes}:{seconds.toString().padStart(2, "0")}
+      </p>
     </div>
   );
 };

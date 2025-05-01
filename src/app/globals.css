@@ -45,6 +45,7 @@
   /* hpp colors */
   --hpp-error: oklch(0.577 0.245 27.325);
   --color-gray: #556877;
+  --color-line-gray: #e3e8ee;
   /* --color-highlight */
 }
 

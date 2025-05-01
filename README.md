@@ -77,5 +77,7 @@ yarn test
   - Deeper End-to-end testing
   - Server actions for put requests
   - Put more effort into thinking about file structure using app router
+  - get Jest to work with typescript (couldn't get it to work)
+  - Fix lint issues related with the above
 
 .env is checked in to make it easier to run the app locally specifically for this test.

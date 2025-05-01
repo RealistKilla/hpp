@@ -11,11 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-separator";
 import { truncateMiddle } from "../lib/truncateMiddle";
 import CopyText from "@/components/CopyText";
 import QRCode from "react-qr-code";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import Separator from "@/components/ui/Separator";
 
 type PayQuoteCardProps = {
   quote: Quote;
@@ -43,51 +43,54 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="mb-6 flex items-center text-center">
           <h1>Pay with {fullCurrencyName}</h1>
         </CardTitle>
-        <p className="text-gray">
+        <p className="text-gray max-w-[320px] text-center">
           To complete this payment send the amount due to the {currencyName}{" "}
           address provided below.
         </p>
       </CardHeader>
-      <CardContent>
-        <Separator />
-        <div className="flex flex-col items-center">
+      <CardContent className="w-full">
+        <Separator className="my-2" />
+        <div className="flex flex-col sm:flex-row justify-between items-center">
           <p className="text-gray">Amount due</p>
           <div className="flex gap-x-1">
-            <p>
+            <p className="font-semibold">
               {quote.data?.paidCurrency.amount} {currencyName}
             </p>
             <CopyText text={quote.data?.paidCurrency.amount!} />
           </div>
         </div>
-        <Separator />
-        <div className="flex flex-col items-center">
+        <Separator className="my-2" />
+        <div className="flex flex-col sm:flex-row justify-between items-center">
           <p className="text-gray">{currencyName} Address</p>
           <div className="flex gap-x-1">
-            <p>{truncatedAddress}</p>
+            <p className="font-semibold">{truncatedAddress}</p>
             <CopyText text={quote.data?.address.address!} />
           </div>
         </div>
-        <div>
+        <div className="grid place-items-center gap-y-2 py-8">
           <QRCode
+            size={160}
+            className="w-full max-w-[160px] h-auto"
             data-testid="qr-code"
             value={quote.data?.address.uri!}
-            size={200}
           />
-          <p>{quote.data?.address.address}</p>
+          <p className="text-wrap break-all text-gray text-sm">
+            {quote.data?.address.address}
+          </p>
         </div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex gap-x-1">
-          <p>Time left to pay</p>
+        <Separator className="my-2" />
+        <div className="flex w-full justify-between items-center">
+          <p className="text-gray">Time left to pay</p>
           <CountdownTimer
             targetTimeMs={quote.data?.quoteExpiryDate!}
             onExpire={onQuoteExpire}
           />
         </div>
-      </CardFooter>
+        <Separator className="my-2" />
+      </CardContent>
     </Card>
   );
 };
