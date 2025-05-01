@@ -100,12 +100,6 @@ export const useCountdown = (
     // Check if targetTimeMs has changed
     const targetChanged = prevTargetRef.current !== targetTimeMs;
     if (targetChanged) {
-      console.log(
-        "Target changed from",
-        prevTargetRef.current,
-        "to",
-        targetTimeMs
-      );
       prevTargetRef.current = targetTimeMs;
     }
 

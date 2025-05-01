@@ -95,24 +95,17 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
     setIsCurrencySelectOpen(false);
   };
 
-  // if the quote is expired, redirect to expired page
-  const redirectToCorrectPage = (status: Quote["status"]) => {
-    if (status === "ACCEPTED") {
-      router.replace(`${pathname}/pay`);
-    } else if (status === "EXPIRED") {
-      router.replace(`${pathname}/expired`);
-    }
-  };
-
   const onAcceptClick = async () => {
     try {
-      await acceptQuoteForCurrency({
+      const acceptQuoteResponse = await acceptQuoteForCurrency({
         uuid: uuid,
         successUrl: "no_url",
       });
 
-      const newQuote = await quote.refetch();
-      newQuote.data && redirectToCorrectPage(newQuote.data?.quoteStatus);
+      await quote.refetch();
+
+      acceptQuoteResponse.quoteStatus === "ACCEPTED" &&
+        router.push(`${pathname}/pay`);
     } catch (error: any) {
       console.log(error.response.data);
     }
@@ -120,16 +113,18 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
   const onQuoteExpire = async () => {
     try {
-      await updateQuote({
+      const updateQuoteResponse = await updateQuote({
         uuid,
         currency: selectedCurrency?.value!,
         payInMethod: "crypto",
       });
       const newQuote = await quote.refetch();
 
-      // newQuote.data && redirectToCorrectPage(newQuote.data?.status);
+      updateQuoteResponse.data?.status === "EXPIRED" &&
+        router.push(`${pathname}/expired`);
     } catch (error) {
-      router.replace(`${pathname}/expired`);
+      // assuming the only error here is that the quote was accepted
+      router.push(`${pathname}/pay`);
     }
   };
 
@@ -236,10 +231,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
               <div className="w-full flex justify-between gap-y-2">
                 <p className="text-gray">Quoted price expires in:</p>
                 <CountdownTimer
-                  targetTimeMs={
-                    // quoteForCurrency.acceptanceExpiryDate ??
-                    quote?.data?.acceptanceExpiryDate
-                  }
+                  targetTimeMs={quote?.data?.acceptanceExpiryDate}
                   onExpire={onQuoteExpire}
                 />
               </div>

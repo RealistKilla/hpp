@@ -16,7 +16,7 @@ export const getQuoteForCurrency = async (body: GetQuoteForCurrencyBody) => {
       `pay/${safeUUID}/update/summary`,
       { currency: body.currency, payInMethod: body.payInMethod }
     );
-    console.log("response", response);
+
     return response.data;
   } catch (error: any) {
     throw error;

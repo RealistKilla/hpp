@@ -24,8 +24,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // dehydrate the queryClient state to be shared between the client and server
-
   return (
     <html lang="en">
       <body
