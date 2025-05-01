@@ -1,10 +1,17 @@
 import { atom, useAtomValue } from "jotai";
 import { z } from "zod";
-import { getQuoteSummary } from "../services/getQuoteSummary";
 import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
 import { useMemo } from "react";
-import { Currency, GetQuoteForCurrencyBody, Quote } from "../lib/types";
+
+import { getQuoteSummary } from "../services/getQuoteSummary";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
+import { acceptQuoteForCurrency } from "../services/acceptQuoteForCurrency";
+import {
+  Currency,
+  GetQuoteForCurrencyBody,
+  AcceptQuoteForCurrencyBody,
+  Quote,
+} from "../lib/types";
 
 export const useQuoteQuery = (uuid: string, initialData: Quote) => {
   // memoize the atom to prevent it from being recreated on every render
@@ -28,6 +35,15 @@ export const quoteForCurrencyAtom = atomWithMutation<
 >(() => ({
   mutationKey: ["quote"],
   mutationFn: (body) => getQuoteForCurrency(body),
+}));
+
+export const acceptQuoteForCurrencyAtom = atomWithMutation<
+  Quote,
+  AcceptQuoteForCurrencyBody,
+  Error
+>(() => ({
+  mutationKey: ["quote"],
+  mutationFn: (body) => acceptQuoteForCurrency(body),
 }));
 
 export const quoteForCurrencyExpiredAtom = atom<boolean>(false);

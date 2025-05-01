@@ -6,8 +6,6 @@ type AcceptQuotePageProps = {
   params: Promise<{ uuid: string }>;
 };
 
-export const dynamic = "force-dynamic";
-
 const AcceptQuotePage = async ({ params }: AcceptQuotePageProps) => {
   const { uuid } = await params;
   const quote = await getQuoteSummary(uuid, true);

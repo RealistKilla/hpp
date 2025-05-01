@@ -9,6 +9,7 @@ import {
 import { useParams, usePathname } from "next/navigation";
 import {
   isCurrencySelectOpenAtom,
+  acceptQuoteForCurrencyAtom,
   quoteForCurrencyAtom,
   selectedCurrencyAtom,
   useQuoteQuery,
@@ -49,6 +50,10 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
   const [{ mutateAsync: updateQuote, isPending: isUpdatingQuote }] =
     useAtom(quoteForCurrencyAtom);
+
+  const [{ mutateAsync: acceptQuote, isPending: isAcceptingQuote }] = useAtom(
+    acceptQuoteForCurrencyAtom
+  );
 
   // handles open and closing of currency select
   const [isCurrencySelectOpen, setIsCurrencySelectOpen] = useAtom(
@@ -99,7 +104,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
   const onAcceptClick = async () => {
     try {
-      const acceptQuoteResponse = await acceptQuoteForCurrency({
+      const acceptQuoteResponse = await acceptQuote({
         uuid: uuid,
         successUrl: "no_url",
       });
@@ -245,7 +250,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                   variant="outline"
                   type="submit"
                 >
-                  {isUpdatingQuote ? (
+                  {isAcceptingQuote ? (
                     <Loader2 className="animate-spin" />
                   ) : (
                     "Confirm"
