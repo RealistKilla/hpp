@@ -5,7 +5,7 @@ type SeparatorProps = {
   orientation?: "horizontal" | "vertical";
   decorative?: boolean;
 };
-const Separator = ({
+const Separator: React.FC<SeparatorProps> = ({
   className,
   orientation = "horizontal",
   decorative = true,

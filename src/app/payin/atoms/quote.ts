@@ -7,6 +7,7 @@ import { Currency, GetQuoteForCurrencyBody, Quote } from "../lib/types";
 import { getQuoteForCurrency } from "../services/getQuoteForCurrency";
 
 export const useQuoteQuery = (uuid: string, initialData: Quote) => {
+  // memoize the atom to prevent it from being recreated on every render
   const quoteAtom = useMemo(
     () =>
       atomWithQuery<Quote | null>(() => ({

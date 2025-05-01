@@ -1,6 +1,5 @@
 import { getQuoteForCurrency } from "../getQuoteForCurrency";
 import { api } from "@/lib/api";
-import uuid from "./services.fixtures";
 import { GetQuoteForCurrencyBody, Quote } from "../../lib/types";
 import { fullQuote } from "../../atoms/test/quote.fixtures";
 

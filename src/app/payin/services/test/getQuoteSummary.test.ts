@@ -1,9 +1,8 @@
 import { getQuoteSummary } from "../getQuoteSummary"; // adjust path as needed
 import { api } from "@/lib/api";
-import uuid from "./services.fixtures";
-import fullQuote from "../../atoms/test/quote.fixtures";
+import { fullQuote } from "../../atoms/test/quote.fixtures";
 import { bvnkApi } from "@/lib/bvnkApi";
-import { Quote } from "../lib/types";
+import { Quote } from "../../lib/types";
 
 jest.mock("@/lib/api", () => ({
   api: { get: jest.fn() },

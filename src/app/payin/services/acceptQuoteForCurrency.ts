@@ -13,7 +13,7 @@ export const acceptQuoteForCurrency = async (
 
   const validationResult = acceptQuoteForCurrencySchema.safeParse({
     ...body,
-    uuid,
+    safeUUID,
   });
 
   if (!validationResult.success) {

@@ -2,7 +2,7 @@ import { acceptQuoteForCurrency } from "../acceptQuoteForCurrency";
 import { api } from "@/lib/api";
 
 import { fullQuote } from "../../atoms/test/quote.fixtures";
-import Quote from "../../lib/types";
+import { Quote } from "../../lib/types";
 import { AcceptQuoteForCurrencyBody } from "../../lib/types";
 
 jest.mock("@/lib/api", () => ({

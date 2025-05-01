@@ -5,18 +5,12 @@ beforeAll(() => {
   }));
 });
 
-// jest.mock("../../services/getQuoteSummary", () => ({
-//   __esModule: true,
-//   getQuoteSummary: jest.fn().mockResolvedValue(fullQuote),
-// }));
-
 import "@testing-library/jest-dom";
 import { renderHook, waitFor } from "@testing-library/react";
 import { Provider as JotaiProvider } from "jotai";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useQuoteQuery } from "../quote";
 import { fullQuote } from "./quote.fixtures";
-
 
 const createWrapper = () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });

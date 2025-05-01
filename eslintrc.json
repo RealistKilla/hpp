@@ -17,5 +17,11 @@
     ],
     "import/order": "off"
   },
-  "ignorePatterns": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+  "ignorePatterns": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.test.ts"
+  ]
 }

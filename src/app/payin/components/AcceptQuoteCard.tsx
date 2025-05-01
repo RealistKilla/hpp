@@ -47,7 +47,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
   // pass server quote to jotai atom
   const quote = useQuoteQuery(uuid, initialQuote);
 
-  const [{ mutateAsync: updateQuote, isLoading: isUpdatingQuote }] =
+  const [{ mutateAsync: updateQuote, isPending: isUpdatingQuote }] =
     useAtom(quoteForCurrencyAtom);
 
   // handles open and closing of currency select
@@ -122,7 +122,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
       });
       const newQuote = await quote.refetch();
 
-      updateQuoteResponse.data?.status === "EXPIRED" &&
+      updateQuoteResponse?.status === "EXPIRED" &&
         router.push(`${pathname}/expired`);
     } catch (error) {
       // assuming the only error here is that the quote was accepted
@@ -177,7 +177,7 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
                   >
                     <p>{getValues("currency")}</p>
                     <div className="flex">
-                      {quote.isLoading && <Loader2 className="animate-spin" />}
+                      {isUpdatingQuote && <Loader2 className="animate-spin" />}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </div>
                   </Button>
