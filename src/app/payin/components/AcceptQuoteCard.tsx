@@ -88,6 +88,8 @@ const AcceptQuoteCard: React.FC<AcceptQuoteCardProps> = ({
 
           await quote.refetch();
         } catch (error) {
+          //assume error is because quote is expired
+          router.push(`${pathname}/expired`);
           console.log("error", error);
         }
       }
