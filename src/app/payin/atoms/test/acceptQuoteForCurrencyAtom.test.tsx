@@ -1,16 +1,16 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { Provider as JotaiProvider, useSetAtom, useAtomValue } from "jotai";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { quoteForCurrencyAtom } from "../quote"; // your atom file
-import { getQuoteForCurrency } from "../../services/getQuoteForCurrency";
+import { acceptQuoteForCurrencyAtom } from "../quote"; // your atom file
+import { acceptQuoteForCurrency } from "../../services/acceptQuoteForCurrency";
 import { fullQuote } from "./quote.fixtures";
 
 // 🔁 Mock the service
-jest.mock("../../services/getQuoteForCurrency", () => ({
-  getQuoteForCurrency: jest.fn(),
+jest.mock("../../services/acceptQuoteForCurrency", () => ({
+  acceptQuoteForCurrency: jest.fn(),
 }));
 
-const mockGetQuoteForCurrency = getQuoteForCurrency as jest.Mock;
+const mockAcceptQuoteForCurrency = acceptQuoteForCurrency as jest.Mock;
 
 const createWrapper = () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -21,13 +21,13 @@ const createWrapper = () => {
   );
 };
 
-describe("quote for currency atom integration test", () => {
+describe("accept quote for currency atom integration test", () => {
   it("successfully mutates and returns data", async () => {
-    mockGetQuoteForCurrency.mockResolvedValueOnce(fullQuote);
+    mockAcceptQuoteForCurrency.mockResolvedValueOnce(fullQuote);
 
     const { result } = renderHook(
       () => {
-        const mutation = useAtomValue(quoteForCurrencyAtom);
+        const mutation = useAtomValue(acceptQuoteForCurrencyAtom);
         return mutation;
       },
       {
@@ -38,16 +38,14 @@ describe("quote for currency atom integration test", () => {
     act(() => {
       result.current.mutate({
         uuid: "3addda90-0d9a-4fb5-813b-072e53ac7f6e",
-        currency: "BTC",
-        payInMethod: "crypto",
+        successUrl: "https://example.com/success",
       });
     });
 
     await waitFor(() => {
-      expect(mockGetQuoteForCurrency).toHaveBeenCalledWith({
+      expect(mockAcceptQuoteForCurrency).toHaveBeenCalledWith({
         uuid: "3addda90-0d9a-4fb5-813b-072e53ac7f6e",
-        currency: "BTC",
-        payInMethod: "crypto",
+        successUrl: "https://example.com/success",
       });
       // expect(result.current.data).toBe(fullQuote);
       expect(result.current.data).toEqual(fullQuote);
@@ -55,11 +53,11 @@ describe("quote for currency atom integration test", () => {
   });
 
   it("handles mutation error", async () => {
-    mockGetQuoteForCurrency.mockRejectedValueOnce(new Error("API failure"));
+    mockAcceptQuoteForCurrency.mockRejectedValueOnce(new Error("API failure"));
 
     const { result } = renderHook(
       () => {
-        const mutation = useAtomValue(quoteForCurrencyAtom);
+        const mutation = useAtomValue(acceptQuoteForCurrencyAtom);
         return mutation;
       },
       {
@@ -70,8 +68,7 @@ describe("quote for currency atom integration test", () => {
     act(() => {
       result.current.mutate({
         uuid: "3addda90-0d9a-4fb5-813b-072e53ac7f6e",
-        currency: "BTC",
-        payInMethod: "crypto",
+        successUrl: "https://example.com/success",
       });
     });
 
