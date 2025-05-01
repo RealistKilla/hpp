@@ -73,7 +73,6 @@ export const useCountdown = (
       expiredForTargetRef.current !== targetTimeMs &&
       onExpire
     ) {
-      console.log("calling onExpire for target:", targetTimeMs);
       // Mark this target as expired
       expiredForTargetRef.current = targetTimeMs;
 

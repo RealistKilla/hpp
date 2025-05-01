@@ -5,14 +5,12 @@ import { redirect } from "next/navigation";
 type AcceptQuotePageProps = {
   params: Promise<{ uuid: string }>;
 };
-export const dynamic = "force-dynamic";
 
 const AcceptQuotePage = async ({ params }: AcceptQuotePageProps) => {
   const { uuid } = await params;
   const quote = await getQuoteSummary(uuid, true);
 
   // redirect to expired page if quote is expired
-  console.log("quote", quote);
   if (quote.quoteStatus === "ACCEPTED") {
     return redirect(`/payin/${uuid}/pay`);
   }

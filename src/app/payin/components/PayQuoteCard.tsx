@@ -38,6 +38,7 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
 
   const onQuoteExpire = async () => {
     // doing it like this because the quote value is not updated when we want to use it for comparison here.
+
     const newQuote = await quote.refetch();
 
     newQuote.data?.status === "EXPIRED" && router.push(`expired`);

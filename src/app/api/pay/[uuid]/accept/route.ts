@@ -39,7 +39,6 @@ export async function PUT(
     );
     return NextResponse.json(response.data);
   } catch (error: any) {
-    console.log("this is the real error", error.response.data);
     return NextResponse.json(
       { error: error.response.data.error },
       {
