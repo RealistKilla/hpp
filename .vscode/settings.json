@@ -1,9 +1,3 @@
 {
-  "typescript.tsdk": "node_modules\\typescript\\lib",
-  "typescript.suggest.completeFunctionCalls": true,
-  "typescript.suggest.enabled": true,
-  "typescript.suggest.completeJSDocs": true,
-  "typescript.suggest.includeAutomaticOptionalChainCompletions": true,
-  "typescript.suggest.includeCompletionsForImportStatements": true,
-  "typescript.tsserver.useSyntaxServer": "auto"
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

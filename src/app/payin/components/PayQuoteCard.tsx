@@ -62,8 +62,8 @@ const PayQuoteCard: React.FC<PayQuoteCardProps> = ({ quote: initialQuote }) => {
             <p className="font-semibold">
               {quote.data?.paidCurrency?.amount} {currencyName}
             </p>
-            {quote.data?.paidCurrency && (
-              <CopyText text={quote.data?.paidCurrency?.amount} />
+            {quote.data?.paidCurrency.amount && (
+              <CopyText text={quote.data?.paidCurrency?.amount.toString()} />
             )}
           </div>
         </div>

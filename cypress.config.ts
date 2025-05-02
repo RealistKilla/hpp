@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   env: {
-    generated_uuid: "94423e7f-90b9-48f1-882b-20e618c7e754",
+    generated_uuid: "[REPLACE_WITH_UUID]",
   },
   e2e: {
     setupNodeEvents(on, config) {
